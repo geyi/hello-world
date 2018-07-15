@@ -281,9 +281,10 @@ ps -aux | sort -rnk 3 | head -20 | awk '{print $1":"$2":"$3}' | column -t -s:
 
 ### 硬链接与软链接
 * 硬链接可由命令 link 或 ln 创建，如下是对文件 oldfile 创建硬链接：
-
-`link oldfile newfile`
-`lk oldfile newfile`
+```
+link oldfile newfile
+lk oldfile newfile
+```
 
 * 若一个 inode 号对应多个文件名，则称这些文件为硬链接。换言之，硬链接就是同一个文件使用了多个别名。硬链接存在以下几点特性：
 	1. 文件有相同的 inode 及 data block；
