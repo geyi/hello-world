@@ -2,8 +2,8 @@
 
 ## 硬链接与软链接
 * 硬链接可由命令 link 或 ln 创建，如下是对文件 oldfile 创建硬链接：
-	* link oldfile newfile
-	* lk oldfile newfile
+`link oldfile newfile`
+`lk oldfile newfile`
 
 * 若一个 inode 号对应多个文件名，则称这些文件为硬链接。换言之，硬链接就是同一个文件使用了多个别名。硬链接存在以下几点特性：
 	1. 文件有相同的 inode 及 data block；
@@ -222,7 +222,7 @@ ps -aux | sort -rnk 3 | head -20
 ps -aux | sort -rnk 3 | head -20 | awk '{print $1":"$2":"$3}' | column -t -s:
 ```
 
-* 查询内存占用排名前20的进程：
+#### 查询内存占用排名前20的进程：
 `ps -aux | sort -rnk 4 | head -20`
 
 
@@ -304,27 +304,27 @@ tcp-backlog 511
 在高并发的环境下，你需要把这个值调高以避免客户端连接缓慢的问题。Linux 内核会一声不响的把这个值缩小成 /proc/sys/net/core/somaxconn 对应的值，所以你要修改这两个值才能达到你的预期。
 系统对于特定端口TCP连接采用了backlog队列缓存，默认长度为511，通过tcp-backlog设定，如果redis用于高并发为了防止缓慢连接占用，可适当调大，linux系统默认为128。
 
-\# MAXMEMORY POLICY: how Redis will select what to remove when maxmemory
-\# is reached. You can select among five behaviors:
-\#
-\# volatile-lru -> remove the key with an expire set using an LRU algorithm
-\# allkeys-lru -> remove any key according to the LRU algorithm
-\# volatile-random -> remove a random key with an expire set
-\# allkeys-random -> remove a random key, any key
-\# volatile-ttl -> remove the key with the nearest expire time (minor TTL)
-\# noeviction -> don't expire at all, just return an error on write operations
-\#
-\# Note: with any of the above policies, Redis will return an error on write
-\#       operations, when there are no suitable keys for eviction.
-\#
-\#       At the date of writing these commands are: set setnx setex append
-\#       incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd
-\#       sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby
-\#       zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby
-\#       getset mset msetnx exec sort
-\#
-\# The default is:
-\#
+\# MAXMEMORY POLICY: how Redis will select what to remove when maxmemory  
+\# is reached. You can select among five behaviors:  
+\#  
+\# volatile-lru -> remove the key with an expire set using an LRU algorithm  
+\# allkeys-lru -> remove any key according to the LRU algorithm  
+\# volatile-random -> remove a random key with an expire set  
+\# allkeys-random -> remove a random key, any key  
+\# volatile-ttl -> remove the key with the nearest expire time (minor TTL)  
+\# noeviction -> don't expire at all, just return an error on write operations  
+\#  
+\# Note: with any of the above policies, Redis will return an error on write  
+\#       operations, when there are no suitable keys for eviction.  
+\#  
+\#       At the date of writing these commands are: set setnx setex append  
+\#       incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd  
+\#       sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby  
+\#       zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby  
+\#       getset mset msetnx exec sort  
+\#  
+\# The default is:  
+\#  
 \# maxmemory-policy noeviction
 
 * 内存不足时的数据清除策略，你有5个选择。
@@ -409,6 +409,7 @@ upstream chat_server {
 location /chat/ws {
     proxy_buffering off;
     proxy_http_version 1.1;
+	proxy_read_timeout 1800s;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
     proxy_pass http://chat_server;
