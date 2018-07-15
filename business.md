@@ -56,7 +56,7 @@
 * prize_money				返奖金额
 * PREPAID_MONEY			本单产生的预支金额
 * remain_prepaid_money	本单使用了其他单预支金额
->预支金额只能使用其它订单产生的预支金额
+> 预支金额只能使用其它订单产生的预支金额
 
 ## 定时任务
 ### MatchListSchedule联赛列表刷新
