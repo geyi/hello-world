@@ -14,10 +14,10 @@ Druid内置提供一个StatFilter，用于统计监控信息。
 </bean>
 ```
 
-WallFilter用于防御SQL注入攻击。  
+WallFilter用于防御SQL注入攻击。
 `<bean id="wallFilter" class="com.alibaba.druid.wall.WallFilter"/>`
 
-多数据源配置  
+多数据源配置
 ```
 <!-- 自定义一个类扩展AbstractRoutingDataSource抽象类，该类相当于数据源DataSourcer的路由中介，可以实现在项目运行时根据相应key值切换到对应的数据源DataSource上 -->
 <bean id="multipleDataSource" class="com.ck.service.common.mybatis.ds.MultipleDataSource">
@@ -35,19 +35,20 @@ WallFilter用于防御SQL注入攻击。
 #### RabbitMQ
 * [ 队列模型 ](http://www.rabbitmq.com/getstarted.html)  
 > virtual host相当于数据库
+
 ##### 简单队列：一个生产者对应一个消费者
 `P---Q---C`
 
 * 缺点：
 	1. 生产者一一对应消费者
 	2. 耦合性高，队列名变更，生产者和消费者需要同时变更
+
 ##### 工作队列：一个生产者对应多个消费者
 ```
        |---C1
 P---Q---
        |---C2
 ```
-
 simple队列是一一对应的，在实际开发中，生产者发送消息是毫不费力的，而消费者一般是要跟业务相结合的，消费者接收到消息之后需要花费时间处理，这时队列就会积压很多消息。
 
 * 轮询分发：消费者1和消费者2处理的数据消息数量是一样的，消费者1都是偶数，消费者2都是奇数。这种方式叫做轮询分发，结果就是不管谁忙谁空闲都不会多给一个消息，任务消息总是你一个我一个。
@@ -58,6 +59,7 @@ simple队列是一一对应的，在实际开发中，生产者发送消息是�
 * 消息持久化：
 	* 如果rabbitmq挂了，我们的消息任然会丢失！
 	* 注：我们将程序中 durable = false; 改成 durable = true; 是不可以的。因为我们已经定义了一个叫 airing_simple_queue 的队列，该队列是未持久化的，rabbitmq不允许使用不同的参数重新定义一个已存在的队列。
+
 ##### 订阅模式：
 ```
        |---Q---C1
