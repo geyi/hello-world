@@ -20,16 +20,18 @@
 	* BatchUpdateOrderPlugin定时扫描10秒前状态为0的订单，将其状态改为10（未开奖）。并处理状态为-5（退款中）的订单。
 
 * 下注玩法：
->|BUY_CODE |AUTO_ID  |OPT_NAME |CLIENT_PROPERTIES                                                                                            |
->|---------|---------|---------|-------------------------------------------------------------------------------------------------------------|
->|1        |37973077 |Lay      |{"marketName":"test_x","inning":"","codeName":"Lay","returnMoney":"5,000","overs":"","runs":"","wickets":""} |
->|2        |37973077 |Back     |{"marketName":"test_x","inning":"","codeName":"Back","returnMoney":"30","overs":"","runs":"","wickets":""}   |
->BUY_CODE：1代表主队赢，2代表客队赢
->OPT_NAME：Lay代表输，Back代表赢
->当BUY_CODE为1时，说明用户买的是主队赢。又因为OPT_NAME为Lay，表示输，所以CLIENT_PROPERTIES的marketName应该为客队队名。与crc_main数据库中t_local_market表中的market_description字段相同。
->|event_id |market_id |specifiers       |market_description |
->|---------|----------|-----------------|-------------------|
->|11490226 |4         |site_market_id=1 |test_x             |
+|BUY_CODE |AUTO_ID  |OPT_NAME |CLIENT_PROPERTIES                                                                                            |
+|---------|---------|---------|-------------------------------------------------------------------------------------------------------------|
+|1        |37973077 |Lay      |{"marketName":"test_x","inning":"","codeName":"Lay","returnMoney":"5,000","overs":"","runs":"","wickets":""} |
+|2        |37973077 |Back     |{"marketName":"test_x","inning":"","codeName":"Back","returnMoney":"30","overs":"","runs":"","wickets":""}   |
+
+BUY_CODE：1代表主队赢，2代表客队赢
+OPT_NAME：Lay代表输，Back代表赢
+当BUY_CODE为1时，说明用户买的是主队赢。又因为OPT_NAME为Lay，表示输，所以CLIENT_PROPERTIES的marketName应该为客队队名。与crc_main数据库中t_local_market表中的market_description字段相同。
+
+|event_id |market_id |specifiers       |market_description |
+|---------|----------|-----------------|-------------------|
+|11490226 |4         |site_market_id=1 |test_x             |
 
 item_money				下注金额
 prize_money				返奖金额
