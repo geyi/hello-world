@@ -58,22 +58,34 @@
 	* remain_prepaid_money	本单使用了其他单预支金额
 >预支金额只能使用其它订单产生的预支金额
 
+## 定时任务
+### MatchListSchedule联赛列表刷新
+* 从t_match_temp表中移除type为1的
 
-session
+* 获取所有的联赛信息
+	* 联赛中没有比赛的联赛被放入removeLeague
+	* 查不到赛事信息的比赛被放入removeMatchList
+	* 更新MongoDB缓存
 
+* 从数据库中查询出比赛列表（一场比赛只属于某一联赛），某一比赛的数据如下：
+```
+{
+  "away_name": "FIRE2",
+  "update_time": "2018-05-10T12:32:06.000+0530",
+  "event_id": "11490238",
+  "home_name": "BBBQ1",
+  "tournament_name": "agfgsf",
+  "format": "T20",
+  "match_time": 1526149800000,
+  "match_status": "1",
+  "tournament_id": "454"
+}
+```
 
-***MatchListSchedule联赛列表刷新***
-从t_match_temp表中移除type为1的
+* 遍历
+* 根据联赛id从MongoDB中查询出联赛下所有比赛的信息，某一联赛的比赛在MongoDB保存的数据如下：
 
-获取所有的联赛信息
-联赛中没有比赛的联赛被放入removeLeague
-查不到赛事信息的比赛被放入removeMatchList
-更新MongoDB缓存
-
-从数据库中查询出比赛列表（一场比赛只属于某一联赛），某一比赛的数据如下：
-{away_name=FIRE2, update_time=2018-05-10T12:32:06.000+0530, event_id=11490238, home_name=BBBQ1, tournament_name=agfgsf, format=T20, match_time=1526149800000, match_status=1, tournament_id=454}
-遍历
-根据联赛id从MongoDB中查询出联赛下所有比赛的信息，某一联赛的比赛在MongoDB保存的数据如下：
+```
 {
 	"_id" : ObjectId("5af40fece4b093ada5c92a69"),
 	"l_id" : "424",
@@ -93,21 +105,22 @@ session
 		}
 	]
 }
-找出与event_id对应的比赛，更新MongoDB中的比赛数据
+```
+
+* 找出与event_id对应的比赛，更新MongoDB中的比赛数据
 
 
-***MatchResultSchedule比赛结果刷新***
-同上
-***ScoreSchedule比赛比分刷新***
-同上
+### MatchResultSchedule比赛结果刷新
+* 同上
+### ScoreSchedule比赛比分刷新
+* 同上
 
+## 推送
+* Your prediction winning ${MONEY} coins have been credited to your account. // 下注
+* Your cricket quiz bet wining ${MONEY} coins have been release to your account // 竞猜
+* Your bought ${MONEY} coins successfully , please refresh to update // 充值
+* You successfully invited one friend and got ${MONEY} free coins. 
+* You used invitation code and got ${MONEY} free coins in your account.Go share with more friends and get more bonus.
 
-queryValidateCode获取某一用户最后一次获取的验证码信息及一天内该帐号获取的验证码次数。
-
-
-***推送***
-Your prediction winning ${MONEY} coins have been credited to your account. // 下注
-Your cricket quiz bet wining ${MONEY} coins have been release to your account // 竞猜
-Your bought ${MONEY} coins successfully , please refresh to update // 充值
-You successfully invited one friend and got ${MONEY} free coins. 
-You used invitation code and got ${MONEY} free coins in your account.Go share with more friends and get more bonus.
+## 杂项
+* queryValidateCode获取某一用户最后一次获取的验证码信息及一天内该帐号获取的验证码次数。
