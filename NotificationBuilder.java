@@ -193,6 +193,16 @@ public class NotificationBuilder {
         return this;
     }
 
+    public NotificationBuilder setTitle(String title) {
+        this.alertObject.put("title", title);
+        return this;
+    }
+
+    public NotificationBuilder setSubtitle(String subtitle) {
+        this.alertObject.put("subtitle", subtitle);
+        return this;
+    }
+
     public NotificationBuilder setUserProperty(String key, Object value) {
         this.payload.put(key, value);
         return this;
