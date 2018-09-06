@@ -360,11 +360,20 @@ Switched to a new branch "iss53"
 14. git log
 	* 查看各个分支当前所指的对象：git log --oneline --decorate
 	* 输出提交历史、各个分支的指向以及项目的分支分叉情况：git log --oneline --decorate --graph --all
+
 15. 打标签
 ```
 git tag -a PRD_20180615_1129 -m ''
 git push origin PRD_20180615_1129
 ```
+
+16. git stash
+    * 查看stash：`git stash list`
+    * 新增stash：`git stash save '1.6.3'`
+	* 删除stash：`git stash drop stash@{0}`
+	* 导出stash：`git stash pop`
+	* 用stash创建分支：`git stash branch 1.6.3`
+	* 查看stash差异：`git stash show`
 
 
 ## JAVA
