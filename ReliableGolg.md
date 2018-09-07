@@ -375,6 +375,9 @@ git push origin PRD_20180615_1129
 	* 用stash创建分支：`git stash branch 1.6.3`
 	* 查看stash差异：`git stash show`
 
+17. 回滚
+    * 回滚到指定commitID：`git checkout <commitID> <filename>`
+
 
 ## JAVA
 
