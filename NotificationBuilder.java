@@ -158,6 +158,16 @@ public class NotificationBuilder {
         return this;
     }
 
+    public NotificationBuilder setMutableContent(int mutableContent) {
+        this.aps.put("mutable-content", mutableContent);
+        return this;
+    }
+
+    public NotificationBuilder setImageAbsoluteString(String imgUrl) {
+        this.aps.put("imageAbsoluteString", imgUrl);
+        return this;
+    }
+
     public NotificationBuilder setAlert(String alert) {
         this.alert = alert;
         return this;
@@ -193,12 +203,12 @@ public class NotificationBuilder {
         return this;
     }
 
-    public NotificationBuilder setTitle(String title) {
+    public NotificationBuilder setAlertTitle(String title) {
         this.alertObject.put("title", title);
         return this;
     }
 
-    public NotificationBuilder setSubtitle(String subtitle) {
+    public NotificationBuilder setAlertSubtitle(String subtitle) {
         this.alertObject.put("subtitle", subtitle);
         return this;
     }

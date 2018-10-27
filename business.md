@@ -28,6 +28,89 @@
 }
 ```
 
+### 订单派奖：
+#### 修改订单状态，使其能重新被派奖
+```
+-- T_ORDER_ITEM
+ update
+	T_ORDER_ITEM
+set
+	ITEM_STATUS = 10,
+	UPDATE_TIME = now()
+where
+	ITEM_ID = '9eb7ca2578ab4e848f9fb31d557cf009';
+
+
+-- T_ORDER_MONEY
+ update
+	T_ORDER_MONEY
+set
+	ITEM_STATUS = 10,
+	UPDATE_TIME = now()
+where
+	ITEM_ID = '9eb7ca2578ab4e848f9fb31d557cf009';
+-- select * from t_order_money WHERE ITEM_ID='9eb7ca2578ab4e848f9fb31d557cf009';
+
+
+-- T_ITEM_CONTENT
+ update
+	T_ITEM_CONTENT
+set
+	BALANCE_STATUS = 0,
+	BALANCE_TIME = now(),
+	CONTENT_STATUS = 10
+where
+	ITEM_ID = '9eb7ca2578ab4e848f9fb31d557cf009';
+```
+#### 查询t_local_event查询主客队
+`select * from crc_main.t_local_event where event_id = '11491366';`
+#### 获取需要算奖的订单
+```
+select
+	i.ITEM_ID itemId,
+	I.ORDER_ID orderId,
+	I.USER_ID userId,
+	I.ITEM_STATUS itemStatus,
+	I.ITEM_MONEY totalItemMoney,
+	C.MATCH_ID matchId,
+	C.MATCH_ODDS odds,
+	C.CONTENT_ID contentId,
+	C.OPT_NAME optName,
+	c.PLAY_ID marketId,
+	c.CLIENT_PROPERTIES clientProperties,
+	c.BUY_CODE outcomeId,
+	M.PREDICE_PROFIT prediceProfit,
+	(
+		M.ITEM_MONEY - I.USERD_PREPAID_MONEY - I.REMAIN_PREPAID_MONEY
+	) itemMoney,
+	M.ID moneyId,
+	M.ACCT_TYPE acctType,
+	M.COST_TYPE costType
+from
+	T_ORDER_ITEM I
+inner join T_ITEM_CONTENT C on
+	I.ITEM_ID = C.ITEM_ID
+inner join T_ORDER_MONEY M on
+	I.ITEM_ID = M.ITEM_ID
+inner join CRC_MAIN.T_local_MARKET T on
+	C.AUTO_ID = T.AUTO_ID
+inner join CRC_MAIN.t_local_market_settlement S on
+	S.EVENT_ID = T.EVENT_ID
+	and S.MARKET_ID = T.MARKET_ID
+	and S.SPECIFIERS = T.SPECIFIERS
+	and S.RESULT = 1
+	and S.outcome_id = C.buy_code
+where
+	C.MATCH_ID = 11491366
+	and C.PLAY_ID = 90
+	and C.BUY_CODE = 3
+	and S.CERTAINTY = 2
+	and I.ITEM_STATUS = 10
+	and C.CONTENT_STATUS = 10
+order by
+	M.ITEM_MONEY desc limit 500;
+```
+
 ### 虚拟余额=真实余额-风险值
 
 ### 订单状态变更过程：

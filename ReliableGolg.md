@@ -33,7 +33,7 @@ WallFilter用于防御SQL注入攻击。
 
 
 ### RabbitMQ
-* [ 队列模型 ](http://www.rabbitmq.com/getstarted.html)  
+* [ 队列模型 ](http://www.rabbitmq.com/getstarted.html)
 > virtual host相当于数据库
 
 #### 简单队列：一个生产者对应一个消费者
@@ -146,10 +146,25 @@ Curator有两种leader选举的policy，分别是LeaderSelector和LeaderLatch。
 
 ***重要：推荐处理方式是当收到SUSPENDED或LOST时抛出CancelLeadershipException异常，这会导致LeaderSelector实例中断并取消执行takeLeadership方法的异常。这非常重要，你必须考虑扩展LeaderSelectorListenerAdapter。***
 
+
 ### log4j
 日志记录器（Logger）的行为等级分为：OFF、FATAL、ERROR、WARN、INFO、DEBUG、ALL或者您定义的级别。Log4j建议只使用四个级别，优先级从高到低分别是 ERROR、WARN、INFO、DEBUG。
 
 自定义日志输出颜色：{FATAL=bright red, ERROR=bright red, WARN=bright yellow, INFO=bright green, DEBUG=bright cyan, TRACE=bright black}
+
+
+### SpringBoot
+#### 外置配置文件
+* Spring程序会按优先级从下面这些路径来加载application.properties配置文件
+    * 当前目录下的/config目录
+    * 当前目录
+    * classpath里的/config目录
+    * classpath根目录
+* 因此，要外置配置文件就很简单了，在jar所在目录新建config文件夹，然后放入配置文件，或者直接放在配置文件在jar目录
+
+#### MongoDB多数据源配置
+* [ 配置 ](https://blog.csdn.net/linhui258/article/details/80790676)
+
 
 
 ## DataBase
@@ -212,6 +227,8 @@ where
 4. Where 子句中经常使用的字段应该创建索引，分组字段或者排序字段应该创建索引，两个表的连接字段应该创建索引。
 5. 更新频繁的字段不适合创建索引，不会出现在 where 子句中的字段不应该创建索引。
 
+* 使用like时会使用索引吗：mysql在使用like查询的时候只有不以%开头的时候，才会使用到索引。
+
 ### redis配置
 \# TCP listen() backlog.  
 \#  
@@ -257,7 +274,11 @@ tcp-backlog 511
 	6. noeviction：不做任何干扰操作，直接返回OOM异常。
 
 ### MySQL
-使用select…for update会把数据给锁住，不过我们需要注意一些锁的级别，MySQL InnoDB默认行级锁。行级锁都是基于索引的，如果一条SQL语句用不到索引是不会使用行级锁的，会使用表级锁把整张表锁住，这点需要注意。
+* 使用select…for update会把数据给锁住，不过我们需要注意一些锁的级别，MySQL InnoDB默认行级锁。行级锁都是基于索引的，如果一条SQL语句用不到索引是不会使用行级锁的，会使用表级锁把整张表锁住，这点需要注意。
+
+### MongoDB
+* 分页查询：skip(3).limit(5)
+* in查询：db.collection.find( { "field" : { $in : array } } );
 
 
 ## Linux
@@ -300,6 +321,22 @@ lk oldfile newfile
 	4. 软链接可对文件或目录创建；
 	5. 创建软链接时，链接计数 i_nlink 不会增加；
 	6. 删除软链接并不影响被指向的文件，但若被指向的原文件被删除，则相关软连接被称为死链接（即 dangling link，若被指向路径文件被重新创建，死链接可恢复为正常的软链接）。
+
+### 查看CPU信息
+* 逻辑CPU个数：cat /proc/cpuinfo | grep "processor" | wc -l
+* 物理CPU个数：cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
+* 每个物理CPU中Core的个数：cat /proc/cpuinfo | grep "cpu cores" | wc -l
+
+### 杂项
+* linux查看限制：ulimit -a
+* 查看网卡带宽：ethtool eth0
+
+### VIM
+* 格式化
+	1. gg跳转到第一行
+	2. shift + v转到可视模式
+	3. shift + g全选
+	4. 按下神奇的=
 
 
 ## Git
@@ -356,6 +393,8 @@ HEAD在 Git 中表示一个指针，指向当前所在的本地分支（译注�
 $ git checkout -b iss53
 Switched to a new branch "iss53"
 ```
+拉取远程分支：
+git checkout -b 本地分支名 origin/远程分支名
 
 14. git log
 	* 查看各个分支当前所指的对象：git log --oneline --decorate
@@ -378,6 +417,17 @@ git push origin PRD_20180615_1129
 17. 回滚
     * 回滚到指定commitID：`git checkout <commitID> <filename>`
 
+18. 使用develope分支覆盖当前分支
+`git reset --hard origin/develope`
+
+19. 修改远程仓库地址
+`git remote set-url origin [url]`
+
+20. 取消commit
+`git reset --mixed 6d13671f8364141529a54ca9dcc408e7462afff4`
+
+21. 缓存输入的用户名和密码：
+`git config --global credential.helper wincred`
 
 ## JAVA
 
@@ -392,8 +442,6 @@ git push origin PRD_20180615_1129
 	
 输出的线程栈信息中的 nid 就是 pid，它是十六进制的，我们将消耗 CPU 最高的线程18250，转成十六进制0x474A，然后从上面的线程栈里找到nid=0x474A的线程，其栈为：
 "Busiest Thread" #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000] java.lang.Thread.State: RUNNABLE at Test$2.run(Test.java:18)
-
-
 
 
 ## Python
@@ -417,6 +465,71 @@ python3 -m spacy validate
 ```
 
 
+## tomcat
+```
+<Executor
+ name="tomcatThreadPool"
+ namePrefix="catalina-exec-"
+ maxThreads="500"
+ minSpareThreads="30"
+ maxIdleTime="60000"
+ prestartminSpareThreads = "true"
+ maxQueueSize = "100"
+/>
+```
+
+参数解释：
+
+* maxThreads：最大并发数，默认设置 200，一般建议在 500 ~ 800，根据硬件设施和业务来判断
+* minSpareThreads：Tomcat 初始化时创建的线程数，默认设置 25
+* maxIdleTime：如果当前线程大于初始化线程，那空闲线程存活的时间，单位毫秒，默认60000=60秒=1分钟。
+* prestartminSpareThreads：在 Tomcat 初始化的时候就初始化 minSpareThreads 的参数值，如果不等于 true，minSpareThreads 的值就没啥效果了
+* maxQueueSize：最大的等待队列数，超过则拒绝请求
+
+```
+<Connector
+	executor="tomcatThreadPool"
+	port="8100"
+	protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+	connectionTimeout="60000"
+	maxConnections="10000"
+	redirectPort="8443"
+	enableLookups="false"
+	acceptCount="100"
+	maxPostSize="10485760"
+	maxHttpHeaderSize="8192"
+	compression="on"
+	disableUploadTimeout="true"
+	compressionMinSize="2048"
+	acceptorThreadCount="2"
+	compressableMimeType="application/json"
+	URIEncoding="utf-8"
+	processorCache="20000"
+	tcpNoDelay="true"
+	connectionLinger="5"/>
+```
+参数解释：
+
+* protocol：Tomcat 8 设置 nio2 更好：org.apache.coyote.http11.Http11Nio2Protocol
+* protocol：Tomcat 6 设置 nio 更好：org.apache.coyote.http11.Http11NioProtocol
+* protocol：Tomcat 8 设置 APR 性能飞快：org.apache.coyote.http11.Http11AprProtocol 更多详情：《Tomcat 8.5 基于 Apache Portable Runtime（APR）库性能优化》（https://renwole.com/archives/361）
+* connectionTimeout：Connector接受一个连接后等待的时间(milliseconds)，默认值是60000。
+* maxConnections：这个值表示最多可以有多少个socket连接到tomcat上
+* enableLookups：禁用DNS查询
+* acceptCount：当tomcat起动的线程数达到最大时，接受排队的请求个数，默认值为100。
+* maxPostSize：设置由容器解析的URL参数的最大长度，-1(小于0)为禁用这个属性，默认为2097152(2M) 请注意， FailedRequestFilter 过滤器可以用来拒绝达到了极限值的请求。
+* maxHttpHeaderSize：http请求头信息的最大程度，超过此长度的部分不予处理。一般8K。
+* compression：是否启用GZIP压缩 on为启用（文本数据压缩）off为不启用，force 压缩所有数据
+* disableUploadTimeout：这个标志允许servlet容器使用一个不同的,通常长在数据上传连接超时。 如果不指定,这个属性被设置为true,表示禁用该时间超时。
+* compressionMinSize：当超过最小数据大小才进行压缩
+* acceptorThreadCount：用于接受连接的线程数量。增加这个值在多CPU的机器上,尽管你永远不会真正需要超过2。 也有很多非维持连接,您可能希望增加这个值。默认值是1。
+* compressableMimeType：配置想压缩的数据类型
+* URIEncoding：网站一般采用UTF-8作为默认编码。
+* processorCache：协议处理程序缓存处理器对象以加快性能。此设置指示缓存这​​些对象的数量。 -1意味着无限制，默认是200。如果不使用Servlet 3.0异步处理，则默认使用与maxThreads设置相同的默认值。如果使用Servlet 3.0异步处理，一个很好的默认设置是使用较大的maxThreads和最大预期并发请求数（同步和异步）。
+* tcpNoDelay：如果设置为true,TCP_NO_DELAY选项将被设置在服务器套接字,而在大多数情况下提高性能。这是默认设置为true。
+* connectionLinger：此连接器使用的套接字在关闭时将停留的秒数 。默认值是-1禁用套接字延迟。
+
+
 ## Nginx
 * 反向代理websocket服务：
 ```
@@ -433,3 +546,5 @@ location /chat/ws {
     proxy_pass http://chat_server;
 }
 ```
+
+
