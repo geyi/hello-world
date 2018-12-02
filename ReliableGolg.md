@@ -530,6 +530,91 @@ python3 -m spacy validate
 * connectionLinger：此连接器使用的套接字在关闭时将停留的秒数 。默认值是-1禁用套接字延迟。
 
 
+## 压测配置修改总结
+### JVM配置
+* JAVA_OPTS='-server -Xms3072M -Xmx3072M -XX:MaxPermSize=1024M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:+UseStringCache -XX:CMSFullGCsBeforeCompaction=5 -XX:+UseFastAccessorMethods -XX:InitialCodeCacheSize=128m -XX:ReservedCodeCacheSize=128m -XX:CompileThreshold=200 -XX:+UseCMSCompactAtFullCollection -XX:+UseThreadPriorities -Xverify:none -XX:-UseGCOverheadLimit -verbose:gc -Xloggc:/app/gm_provider1/tc/logs/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCDetails'
+* JAVA_OPTS="$JAVA_OPTS -Djava.library.path=/app/gm_provider1/tc/lib -agentpath:/app/gm_provider1/jprofiler10/bin/linux-x64/libjprofilerti.so=port=8849"
+
+### Druid数据库连接池配置
+* db.auth.maxPoolSize=100
+* db.auth.initialPoolSize=50
+* db.maxWait=30000
+* db.timeBetweenEvictionRunsMillis=60000
+* db.minEvictableIdleTimeMillis=1800000
+* db.maxPoolPreparedStatementPerConnectionSize=500
+* db.addr=jdbc:mysql://192.168.77.151:13306/crc_game?useUnicode=true&characterEncoding=UTF-8
+* db.user=crc_game
+* db.password=by2015crc_game
+
+<!-- 初始化时建立物理连接的个数 -->
+<property name="initialSize" value="${db.initialPoolSize}" />
+<!-- 最小连接池数量 -->
+<property name="minIdle" value="${db.initialPoolSize}" />
+<!-- 最大连接池数量 -->
+<property name="maxActive" value="${db.maxPoolSize}" />
+<!-- 获取连接时最大等待时间，单位毫秒 -->
+<property name="maxWait" value="${db.maxWait}" />
+<!-- 1)Destroy线程会检测连接的间隔时间，如果连接空闲时间大于等于minEvictableIdleTimeMillis则关闭物理连接 2)testWhileIdle的判断依据 -->
+<property name="timeBetweenEvictionRunsMillis" value="${db.timeBetweenEvictionRunsMillis}" />
+<!-- 连接保持空闲而不被驱逐的最长时间 -->
+<property name="minEvictableIdleTimeMillis" value="${db.minEvictableIdleTimeMillis}" />
+<!-- 用来检测连接是否有效的sql，如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会其作用
+	 不需要配置validationQuery，如果不配置的情况下会走ping命令，性能更高 -->
+<!-- <property name="validationQuery" value="SELECT 1" /> -->
+<!-- 单位：秒，检测连接是否有效的超时时间 -->
+<!-- <property name="validationQueryTimeout" value="1" /> -->
+<!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效 -->
+<!-- <property name="testWhileIdle" value="true" /> -->
+<!-- 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能 -->
+<!-- <property name="testOnBorrow" value="false" /> -->
+<!-- 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能 -->
+<!-- <property name="testOnReturn" value="false" /> -->
+<!-- 是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭 -->
+<property name="poolPreparedStatements" value="false" />
+<!-- 每个连接上PSCache的大小 -->
+<!-- <property name="maxPoolPreparedStatementPerConnectionSize" value="${db.maxPoolPreparedStatementPerConnectionSize}" /> -->
+<!-- 超过时间限制是否回收 -->
+<property name="removeAbandoned" value="false" />
+<!-- 超时时间；单位为秒 -->
+<property name="removeAbandonedTimeout" value="1200" />
+<!-- 关闭abanded连接时输出错误日志 -->
+<property name="logAbandoned" value="true" />
+<!-- 数据库连接地址 -->
+<property name="url" value="${db.addr}" />
+<!-- 数据库登录用户名 -->
+<property name="username" value="${db.user}" />
+<!-- 数据库登录密码 -->
+<property name="password" value="${db.password}" />
+
+### MongoDB连接配置
+game.mongodb.dbname=ck_game
+game.mongodb.username=
+game.mongodb.password=
+mongodb.replicaSet=192.168.88.101:27017
+\# 每个host允许链接的最大链接数
+mongodb.connectionsPerHost=100
+\# 线程队列数，它以上面connectionsPerHost值相乘的结果就是线程队列最大值
+mongodb.threadsAllowedToBlockForConnectionMultiplier=10
+\# 链接超时的毫秒数
+mongodb.connectTimeout=10000
+\# 一个线程等待链接可用的最大等待毫秒数
+mongodb.maxWaitTime=5000
+\# 链接不能建立时是否重试
+mongodb.autoConnectRetry=false
+\# 该标志用于控制socket保持活动的功能
+mongodb.socketKeepAlive=false
+\# socket读写超时时间，推荐为不超时，即0
+mongodb.socketTimeout=0
+\# 为true表示读写分离
+mongodb.slaveok=false
+mongodb.writeNumber=10
+mongodb.writeTimeout=0
+mongodb.writeFsync=true
+
+### MyCat性能调优
+* 见MyCat性能调优指南
+
+
 ## Nginx
 * 反向代理websocket服务：
 ```
