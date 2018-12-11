@@ -275,6 +275,11 @@ tcp-backlog 511
 
 ### MySQL
 * 使用select…for update会把数据给锁住，不过我们需要注意一些锁的级别，MySQL InnoDB默认行级锁。行级锁都是基于索引的，如果一条SQL语句用不到索引是不会使用行级锁的，会使用表级锁把整张表锁住，这点需要注意。
+* 显示mysql中的所有进程：mysql -uroot -pYxqm2015_ -e 'show full processlist;'
+* 登录mycat管理后台：mysql -u crc_auth -p -h 127.0.0.1 -P 19066
+* 显示mycat当前processors的处理情况：show @@processor;
+* 显示mycat记录的慢查询：show @@sql.slow;
+* 显示mysql当前的状态：mysqladmin -uroot -pYxqm2015_ status
 
 ### MongoDB
 * 分页查询：skip(3).limit(5)
@@ -330,6 +335,7 @@ lk oldfile newfile
 ### 杂项
 * linux查看限制：ulimit -a
 * 查看网卡带宽：ethtool eth0
+* 查询连接数：netstat -an | grep 3306|wc -l
 
 ### VIM
 * 格式化
