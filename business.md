@@ -4,6 +4,7 @@
 * 用户登录时将用户信息保存到tair缓存中。
 
 ## 订单
+
 ### 目前使用到的订单状态：
 * 订单确认中
 * 待开奖
@@ -126,7 +127,7 @@ order by
 |1        |37973077 |Lay      |{"marketName":"test_x","inning":"","codeName":"Lay","returnMoney":"5,000","overs":"","runs":"","wickets":""} |
 |2        |37973077 |Back     |{"marketName":"test_x","inning":"","codeName":"Back","returnMoney":"30","overs":"","runs":"","wickets":""}   |
 
-* **BUY_CODE：1代表主队赢，2代表客队赢**
+* **BUY_CODE：1代表主队赢，2代表客队赢，3not，4yes**
 * **OPT_NAME：Lay代表输，Back代表赢**
 * **当BUY_CODE为1时，说明用户买的是主队赢。又因为OPT_NAME为Lay，表示输，所以CLIENT_PROPERTIES的marketName应该为客队队名。与crc_main数据库中t_local_market表中的market_description字段相同**
 
@@ -141,9 +142,49 @@ order by
 * remain_prepaid_money	本单使用了其他单预支金额
 > 预支金额只能使用其它订单产生的预支金额
 
-> hello world
+### 风险值
+* 1代表主队赢，2代表客队赢
+1. 如果用户买1，即主队赢
+2. 产生了两条风险值记录（一个用户一场比赛）1、2。当主队赢时，betwon为预计盈利；当主队输时，betwon为负的下注金额。
+3. 之后用户继续下单，继续买1（主队赢）。当主队赢时，betwon为当前betwon的值 + 预计盈利；当主队输时，betwon为当前betwon的值 - 下注金额。
+
+### 下单接口
+* 接口日志见20190102笔记
+
+```
+{
+  "msg": "Successful",
+  "msg_code": "0",
+  "res_data": {
+    "value": {
+      "money": {
+        "1_0": 100
+      },
+      "balance_money": 5351553,
+      "risk_balance": 5344678,
+      "risk_change": -100,
+      "market_id": "4",
+      "risk_info": "home : 8.0; away : -200.0",
+      "userPrepaidMoney": 0,
+      "risk_result": -6875,
+      "order_id": "8f5035634f564f4cbf055e812aa2dc5c",
+      "remainMoney": 100
+    }
+  }
+}
+money：当前订单的下注金额
+balance_money：用户实际余额
+risk_balance：用户可用余额
+risk_change：当前下注导致风险值的变化
+market_id：玩法id
+risk_info：用户当前下注比赛的风险值信息
+risk_result：用户最终风险值
+order_id：订单号
+remainMoney：当前订单的下注金额
+```
 
 ## 定时任务
+
 ### MatchListSchedule联赛列表刷新
 * 从t_match_temp表中移除type为1的
 
@@ -209,3 +250,55 @@ order by
 
 ## 杂项
 * queryValidateCode获取某一用户最后一次获取的验证码信息及一天内该帐号获取的验证码次数。
+
+## tips
+* tip4是比赛的状态 tip1是投币结果 tip2是比赛进行中 打完第一局的时候会显示哪个队伍领先了多少分之类的 tip3就是赛果
+* 希望比赛还没有tip1(投币结果)的时候显示时间，当比赛开始的时候显示tip4，当比赛有tip2的时候展示tip2，比赛结束的时候有tip3展示tip3
+
+## 邮件发送策略
+1. 优先选择邮件服务稳定的提供商（可配置）。
+2. 当有多个邮件服务提供商时，先使用各个服务商每月的免费限额。
+3. 当一个邮件服务商连续3次（可配置）发送邮件失败，则1小时（可配置）内不使用该邮件服务商的服务，转用下一个邮件服务商，以此类推。如果所有服务商发送邮件都失败则将错误消息写入日志，人工介入。
+4. 利用Redisson限制并发量
+
+* 例如：亚马逊、mailgun、腾讯的免费限额分别为62000、10000、500（考虑到腾讯的免费限额实际达不到500就出现了邮件发送失败的问题，设置腾讯的阈值为400）
+
+```
+CREATE TABLE crc_auth.t_mail_stats (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TYPE` varchar(50) NOT NULL COMMENT '邮件服务商，amazonSES、mailGun、tencentMail',
+  `CUR_MONTH` varchar(20) NOT NULL COMMENT '当月日期，格式：yyyy-MM',
+  `LIMIT` int(8) DEFAULT 0 COMMENT '每月限额',
+  `SUCCESSFUL_COUNT` int(8) DEFAULT 0 COMMENT '成功次数',
+  `FAILED_COUNT` int(8) DEFAULT 0 COMMENT '失败次数',
+  `CONTINUOUS_FAILED_COUNT` int(8) DEFAULT 0 COMMENT '连续失败次数',
+  `UNLOCK_TIME` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '解锁时间',
+  `CRT_TIME` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATE_TIME` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `uniq_type_month` (`TYPE`, `CUR_MONTH`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='邮件统计表';
+```
+
+* 判断每月免费限额，判断连续发送失败次数（即：解锁时间）
+
+```
+{
+  "code": "887813",
+  "expireTime": 1540195067038,
+  "crtTime": 1540194767038,
+  "language": "en",
+  "id": 403834,
+  "event": "REG",
+  "type": 1,
+  "tagVal": "kumarthirugudu100@gmail.com"
+}
+code：随机数
+expireTime：过期时间
+crtTime：创建时间
+language：语言
+id：t_validate_code表主键
+event：REG(注册)，BIND(绑定)，RESET（重置密码）
+type：1是邮箱，2是电话
+tagVal：收件邮箱
+```

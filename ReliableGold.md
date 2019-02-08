@@ -3,8 +3,8 @@
 ## FrameWork
 
 ### Druid
-Druid内置提供了用于监控的StatFilter、日志输出的Log系列Filter、防御SQL注入攻击的WallFilter。  
-Druid内置提供一个StatFilter，用于统计监控信息。
+* Druid内置提供了用于监控的StatFilter、日志输出的Log系列Filter、防御SQL注入攻击的WallFilter。  
+* Druid内置提供一个StatFilter，用于统计监控信息。
 ```
 <bean id="statFilter" class="com.alibaba.druid.filter.stat.StatFilter">
 	<!-- 不合并查询sql -->
@@ -14,10 +14,10 @@ Druid内置提供一个StatFilter，用于统计监控信息。
 </bean>
 ```
 
-WallFilter用于防御SQL注入攻击。
+* WallFilter用于防御SQL注入攻击。
 `<bean id="wallFilter" class="com.alibaba.druid.wall.WallFilter"/>`
 
-多数据源配置
+* 多数据源配置
 ```
 <!-- 自定义一个类扩展AbstractRoutingDataSource抽象类，该类相当于数据源DataSourcer的路由中介，可以实现在项目运行时根据相应key值切换到对应的数据源DataSource上 -->
 <bean id="multipleDataSource" class="com.ck.service.common.mybatis.ds.MultipleDataSource">
@@ -280,10 +280,21 @@ tcp-backlog 511
 * 显示mycat当前processors的处理情况：show @@processor;
 * 显示mycat记录的慢查询：show @@sql.slow;
 * 显示mysql当前的状态：mysqladmin -uroot -pYxqm2015_ status
+* mysql查询表占用空间大小：
+```
+select
+	concat(round(sum(DATA_LENGTH / 1024 / 1024), 2), 'MB') as data
+from
+	information_schema.TABLES
+where
+	table_schema = 'crc_auth'
+	and table_name = 't_device_record';
+```
 
 ### MongoDB
 * 分页查询：skip(3).limit(5)
 * in查询：db.collection.find( { "field" : { $in : array } } );
+* 查询重复列：db.T_Match_Live_Info.aggregate([{ $group: { _id: { e_id: "$e_id" }, uniqueIds: { $addToSet: "$_id" }, count: { $sum: 1 } }}, { $match: { count: { $gt: 1 } }}])
 
 
 ## Linux
@@ -344,6 +355,10 @@ lk oldfile newfile
 	3. shift + g全选
 	4. 按下神奇的=
 
+### yum
+* yum -y install vim-common.x86_64 vim-enhanced.x86_64 vim-minimal.x86_64
+* yum -y install iptables-services
+* yum -y install wget
 
 ## Git
 工作目录下的每一个文件都不外乎这两种状态：已跟踪或未跟踪。 已跟踪的文件是指那些被纳入了版本控制的文件，在上一次快照中有它们的记录。在工作一段时间后，它们的状态可能处于未修改，已修改或已放入暂存区。
@@ -402,6 +417,9 @@ Switched to a new branch "iss53"
 拉取远程分支：
 git checkout -b 本地分支名 origin/远程分支名
 
+删除远程分支：
+git push origin --delete 远程分支名
+
 14. git log
 	* 查看各个分支当前所指的对象：git log --oneline --decorate
 	* 输出提交历史、各个分支的指向以及项目的分支分叉情况：git log --oneline --decorate --graph --all
@@ -411,6 +429,9 @@ git checkout -b 本地分支名 origin/远程分支名
 git tag -a PRD_20180615_1129 -m ''
 git push origin PRD_20180615_1129
 ```
+
+* 删除远程标签
+`git push origin :refs/tags/标签名`
 
 16. git stash
     * 查看stash：`git stash list`
@@ -537,6 +558,7 @@ python3 -m spacy validate
 
 
 ## 压测配置修改总结
+
 ### JVM配置
 * JAVA_OPTS='-server -Xms3072M -Xmx3072M -XX:MaxPermSize=1024M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:+UseStringCache -XX:CMSFullGCsBeforeCompaction=5 -XX:+UseFastAccessorMethods -XX:InitialCodeCacheSize=128m -XX:ReservedCodeCacheSize=128m -XX:CompileThreshold=200 -XX:+UseCMSCompactAtFullCollection -XX:+UseThreadPriorities -Xverify:none -XX:-UseGCOverheadLimit -verbose:gc -Xloggc:/app/gm_provider1/tc/logs/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCDetails'
 * JAVA_OPTS="$JAVA_OPTS -Djava.library.path=/app/gm_provider1/tc/lib -agentpath:/app/gm_provider1/jprofiler10/bin/linux-x64/libjprofilerti.so=port=8849"
@@ -621,6 +643,18 @@ mongodb.writeFsync=true
 * 见MyCat性能调优指南
 
 
+## 数据结构
+
+### 二叉排序树（Binary Sort Tree）
+* 二叉排序树又称二叉查找树。它或者是一棵空树，或者是具有下列性质的二叉树：
+1. 若左子树不空，则左子树上所有结点的值均小于它的根结点的值；
+2. 若右子树不空，则右子树上所有结点的值均大于它的根结点的值；
+3. 左、右子树也分别为二叉排序树；
+
+### 平衡二叉树
+* 定义：它或者是一颗空树，或者具有以下性质的二叉树：它的左子树和右子树的深度之差(平衡因子)的绝对值不超过1，且它的左子树和右子树都是一颗平衡二叉树。
+
+
 ## Nginx
 * 反向代理websocket服务：
 ```
@@ -637,5 +671,3 @@ location /chat/ws {
     proxy_pass http://chat_server;
 }
 ```
-
-
