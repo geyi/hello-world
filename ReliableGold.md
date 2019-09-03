@@ -298,6 +298,7 @@ where
 
 
 ## Linux
+
 ### 查看日志文件：
 * 查看日志文件600行至1000行的内容：sed -n "600,1000p" error_gm_push_2018-05-08.log
 * 查看日志文件前100行的内容：head -100 error_gm_push_2018-05-08.log
@@ -347,6 +348,8 @@ lk oldfile newfile
 * linux查看限制：ulimit -a
 * 查看网卡带宽：ethtool eth0
 * 查询连接数：netstat -an | grep 3306|wc -l
+* 同步网络时间：ntpdate -u ntp.api.bz
+* aprops是一个可以帮你“发现”其他命令的命令。这条命令使用之后，会根据你的搜索条件为你列出所有符合选项的命令，同时还会附带一些简短的解释。比如你忽然想知道如何将目录的内容给列出来，这时候你就可以输入下面的命令：[oracle@dev4 ~]$ apropos cpu
 
 ### VIM
 * 格式化
@@ -400,6 +403,12 @@ $ git add README
 
 只有当你有所克隆服务器的写入权限，并且之前没有人推送过时，这条命令才能生效。 当你和其他人在同一时间克隆，他们先推送到上游然后你再推送到上游，你的推送就会毫无疑问地被拒绝。 你必须先将他们的工作拉取下来并将其合并进你的工作后才能推送。 阅读 Git 分支 了解如何推送到远程仓库服务器的详细信息。
 
+* 推送一个新的项目
+	1. git remote add origin <项目地址>
+	2. git push -u origin master
+
+* 取消与仓库的关联：`git remote remove origin`
+
 13. 分支
 Git 仓库中有五个对象：三个 blob 对象（保存着文件快照）、一个树对象（记录着目录结构和 blob 对象索引）以及一个提交对象（包含着指向前述树对象的指针和所有提交信息）。
 
@@ -419,6 +428,9 @@ git checkout -b 本地分支名 origin/远程分支名
 
 删除远程分支：
 git push origin --delete 远程分支名
+
+push新的分支：
+git push origin dev:dev
 
 14. git log
 	* 查看各个分支当前所指的对象：git log --oneline --decorate
@@ -470,6 +482,8 @@ git push origin PRD_20180615_1129
 输出的线程栈信息中的 nid 就是 pid，它是十六进制的，我们将消耗 CPU 最高的线程18250，转成十六进制0x474A，然后从上面的线程栈里找到nid=0x474A的线程，其栈为：
 "Busiest Thread" #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000] java.lang.Thread.State: RUNNABLE at Test$2.run(Test.java:18)
 
+### 字符集
+* 因为ISO-8859-1编码范围使用了单字节内的所有空间，在支持ISO-8859-1的系统中传输和存储其他任何编码的字节流都不会被抛弃。换言之，把其他任何编码的字节流当作ISO-8859-1编码看待都没有问题。这是个很重要的特性，MySQL数据库默认编码是Latin1就是利用了这个特性。ASCII编码是一个7位的容器，ISO-8859-1编码是一个8位的容器。
 
 ## Python
 
