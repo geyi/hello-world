@@ -143,6 +143,8 @@ metadata:
 * 删除命名空间下的所有资源：kubectl delete all -all
 
 
+## 4 副本机制和其他控制器：部署托管的 pod
+### 4.1 保持 pod 健康
 
 
 
